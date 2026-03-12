@@ -211,6 +211,4 @@ This project is built for educational purposes to help students and beginners ex
 
 ---
 
-# License
 
-MIT License
