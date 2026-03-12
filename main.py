@@ -1,7 +1,7 @@
 import socket
 import display
 
-
+display.get_clear()
 display.main()
 HOST = "127.0.0.1"
 PORT = 9999
