@@ -1,6 +1,15 @@
 import socket
 from core.display import main, get_clear
 
+# Definisi Warna (ANSI Escape Codes)
+GREEN = "\033[92m"
+BLUE = "\033[94m"
+CYAN = "\033[96m"
+YELLOW = "\033[93m"
+RED = "\033[91m"
+BOLD = "\033[1m"
+RESET = "\033[0m"
+
 get_clear()
 main()
 
@@ -12,7 +21,7 @@ server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 server.bind((HOST, PORT))
 server.listen(5)
 
-print(f"Listening on http://{HOST}:{PORT} ...")
+print(f"{GREEN}{BOLD}Listening on http://{HOST}:{PORT} ...{RESET}")
 
 while True:
     client, addr = server.accept()
@@ -23,9 +32,11 @@ while True:
             continue
 
         request = data.decode('utf-8')
-        print(f"\nConnection from {addr}")
-        print("----- RAW REQUEST -----")
-        print(request)
+        
+        # Header Log Koneksi
+        print(f"\n{BLUE}{'='*40}{RESET}")
+        print(f"{CYAN}Connection from:{RESET} {YELLOW}{addr}{RESET}")
+        print(f"{BLUE}{'='*40}{RESET}")
 
         lines = request.split("\r\n")
         if len(lines) > 0:
@@ -34,16 +45,22 @@ while True:
             
             if len(parts) == 3:
                 method, path, version = parts
-                print("\n----- PARSED DATA -----")
-                print(f"Method: {method}")
-                print(f"Path: {path}")
-                print(f"HTTP Version: {version}")
+                
+                print(f"{BOLD}----- PARSED DATA -----{RESET}")
+                print(f"{CYAN}Method      :{RESET} {GREEN}{method}{RESET}")
+                print(f"{CYAN}Path        :{RESET} {YELLOW}{path}{RESET}")
+                print(f"{CYAN}HTTP Version:{RESET} {version}")
 
-                print("\nHeaders:")
+                print(f"\n{BOLD}Headers:{RESET}")
                 for line in lines[1:]:
                     if line == "":
                         break
-                    print(line)
+                    # Memberi warna berbeda untuk Key: Value pada Header
+                    if ": " in line:
+                        key, val = line.split(": ", 1)
+                        print(f"  {BLUE}{key}{RESET}: {val}")
+                    else:
+                        print(f"  {line}")
 
         response = (
             "HTTP/1.1 200 OK\r\n"
@@ -54,8 +71,9 @@ while True:
         )
 
         client.sendall(response.encode('utf-8'))
+        print(f"\n{GREEN}✔ Response sent successfully!{RESET}")
 
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"{RED}An error occurred: {e}{RESET}")
     finally:
         client.close()
